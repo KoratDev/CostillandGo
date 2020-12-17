@@ -1,21 +1,6 @@
 from tkinter import ttk
 from tkinter import *
-import pymysql
-
-class DataBase:
-    def __init__(self):
-        self.connection = pymysql.connect(
-            host = "localhost",
-            user = "root",
-            password = "mayo140501",
-            db = ""
-        )
-
-        self.cursor = self.connection.cursor()
-
-        print("Conexión establecida exitosamente.")
-
-database = DataBase
+import mysql.connector
 
 class Application:
 
@@ -111,6 +96,27 @@ class Application:
         self.customer_table.heading("#2", text = "Phone number")
         self.customer_table.heading("#3", text = "Shipping address")
 
-window = Tk()
-root = Application(window)
-window.mainloop()
+    def database(self,query):
+        try:
+            mydb = mysql.connector.connect(
+                host = "localhost",
+                user = "root",
+                passwd = "mayo140501",
+                database = "costillandgo"
+                )
+            print(mydb)
+        except mysql.connector.Error as e:
+            print("Error al conectarse a la base de datos.", e)
+        cursor = mydb.cursor()
+        cursor.execute(query)
+        return cursor
+    def product_db(self):
+        cursor = self.database("SELECT product, price FROM costillandgo.products;")
+        for (product, price) in cursor:
+            self.product_table.insert("", 0, text = product, values = price)
+
+if __name__ == "__main__":
+    window = Tk()
+    app = Application(window)
+    app.product_db()
+    window.mainloop()
